@@ -12,4 +12,4 @@
 
 ## 動作環境
 
-このLINEBOTは[Google Cloud Platform](https://cloud.google.com/)の[Dialogflow](https://dialogflow.cloud.google.com/)のGoogle Cloud Functionsで動作を確認しています
+このLINEBOTは[Google Cloud Platform](https://cloud.google.com/)のGoogle Cloud Functionsで動作を確認しています
