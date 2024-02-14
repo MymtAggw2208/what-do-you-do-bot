@@ -72,7 +72,7 @@ def main(request):
                             # 存在する場合、キーワード指定してGoogleMapへ
                             reply_data.append(
                                 TemplateSendMessage(
-                                    alt_text='質問',
+                                    alt_text='探したよ！',
                                     template=ButtonsTemplate(
                                         text = '探したよ！',
                                         actions=[
@@ -122,7 +122,7 @@ def make_button_template(idx):
                 )
             )
     message_template = TemplateSendMessage(
-        alt_text='質問',
+        alt_text=questions[idx],
         template=ButtonsTemplate(
             text = questions[idx],            
             actions=button_list
