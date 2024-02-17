@@ -17,7 +17,7 @@ from linebot.models import (
 
 conversation_status = {}
 questions = ['ご予定は？','何食べたい？','何したい？','どこ行きたい？']
-selections = [{1:'ごはん',2:'あそび',3:'メンテ'},
+selections = [{'ごはん':1,'あそび':2,'メンテ':3},
               ['和食','洋食','中華'],
               ['運動','ゲーム','読書','映画'],
               ['マッサージ','美容院','病院']]
@@ -54,22 +54,17 @@ def main(request):
                     reply_data.append(make_button_template(0))
                 else:
                     # 会話履歴が残っている場合、返答内容をチェック
-                    if conversation_status[userid] == 0:
-                        # 0の場合、選択肢から返信しているかどうかチェック
-                        if event.message.text in selections[0].values():
-                            # 存在する場合はkeyを次の質問の添え字として使用
+                    status = conversation_status[userid]
+                    # 選択肢から返信しているかどうかチェック
+                    if event.message.text in selections[status]:
+                        # 選択肢から返信している場合、ステータスが0なら次の質問へ
+                        if status == 0:
                             for key, value in selections[0].items():
-                                if value == event.message.text:
-                                    conversation_status[userid] = key
-                                    reply_data.append(make_button_template(key))
+                                if key == event.message.text:
+                                    conversation_status[userid] = value
+                                    reply_data.append(make_button_template(value))
                         else:
-                            # 存在しない場合、質問を再送信
-                            reply_data.append(TextSendMessage(text='ボタンから選んでね'))
-                            reply_data.append(make_button_template(0))
-                    else:
-                        # 0以外の場合、選択肢から返信しているかどうかチェック
-                        if event.message.text in selections[conversation_status[userid]]:
-                            # 存在する場合、キーワード指定してGoogleMapへ
+                            #ステータスが0以外の場合、キーワードを指定してGoogleMapへ
                             reply_data.append(
                                 TemplateSendMessage(
                                     alt_text='探したよ！',
@@ -84,10 +79,10 @@ def main(request):
                                     )))
                             # ステータスを削除
                             del conversation_status[userid]
-                        else:
-                            # 存在しない場合、質問を再送信
-                            reply_data.append(TextSendMessage(text='ボタンから選んでね'))
-                            reply_data.append(make_button_template(conversation_status[userid]))
+                    else:
+                        # 選択肢から返信していない場合、質問を再送信
+                        reply_data.append(TextSendMessage(text='ボタンから選んでね'))
+                        reply_data.append(make_button_template(conversation_status[userid]))
                     
                 line_bot_api.reply_message(
                     event.reply_token,
@@ -103,8 +98,8 @@ def make_button_template(idx):
     button_list = []
     # selectionsから取得した内容がdictの場合
     if isinstance(selections[idx],dict):
-        # 全ての値を取得してメッセージアクションを作成
-        for key in selections[idx].values():
+        # 全てのキーを取得してメッセージアクションを作成
+        for key in selections[idx]:
             button_list.append(
                 MessageAction(
                     label=key,
